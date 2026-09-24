@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#8fc9ea">
+<title>提瓦特旅人图鉴 · 原神角色手账</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<canvas id="ambient" aria-hidden="true"></canvas>
+
+<!-- ================= 入场 ================= -->
+<div id="entrance">
+  <div class="entrance-glow"></div>
+  <div class="entrance-card">
+    <div class="logo-mark" aria-hidden="true">
+      <svg viewBox="0 0 120 120" width="88" height="88">
+        <path d="M60,12 L70,50 L108,60 L70,70 L60,108 L50,70 L12,60 L50,50 Z" fill="#ffd76e" stroke="#fff" stroke-width="3" stroke-linejoin="round"/>
+        <circle cx="60" cy="60" r="16" fill="#fff"/>
+      </svg>
+    </div>
+    <h1 class="entrance-title">提瓦特旅人图鉴</h1>
+    <p class="entrance-sub">Teyvat Traveler's Handbook — 原神角色手账</p>
+    <div class="entrance-tags">
+      <span>✦ 九大区域</span><span>✦ 96+ 自机角色</span><span>✦ 官方原声配音</span><span>✦ 官方 OST 配乐</span>
+    </div>
+    <button id="enter-btn" class="btn-primary btn-big">♪ 开启旅程</button>
+    <p class="entrance-hint">点击后播放「原神主题曲」（官方 OST），并开放全部角色语音与配乐</p>
+    <p class="entrance-note">同人创作 · 非官方作品 · 图片/语音/音乐均来自公开网络资源，版权归米哈游 miHoYo</p>
+  </div>
+</div>
+
+<!-- ================= 顶栏 ================= -->
+<header id="topbar">
+  <button id="logo-btn" class="logo" title="返回首页">
+    <svg viewBox="0 0 120 120" width="26" height="26"><path d="M60,12 L70,50 L108,60 L70,70 L60,108 L50,70 L12,60 L50,50 Z" fill="#ffd76e" stroke="#fff" stroke-width="4" stroke-linejoin="round"/></svg>
+    <span>提瓦特旅人图鉴</span>
+  </button>
+  <nav id="main-nav">
+    <button class="nav-btn" data-view="home">首页</button>
+    <button class="nav-btn" data-view="regions">提瓦特图鉴</button>
+    <button class="nav-btn" data-view="about">关于</button>
+  </nav>
+  <div class="top-actions">
+    <button id="search-btn" class="icon-btn" title="搜索角色（/ 或 Ctrl+K）">⌕ 搜索</button>
+    <button id="music-btn" class="icon-btn" title="音乐开关（M）">♪</button>
+    <canvas id="music-vis" width="52" height="20"></canvas>
+  </div>
+</header>
+
+<main id="main">
+  <!-- ============ 首页 ============ -->
+  <section id="view-home" class="view">
+    <div class="hero">
+      <p class="hero-kicker">✦ 欢迎来到提瓦特 ✦</p>
+      <h2 class="hero-title">踏上旅途，<br>遇见<span class="grad-text">每一种风</span></h2>
+      <p class="hero-desc">在原神的世界里，每一片土地都有自己的歌。<br>这里收录了九大国度与全部自机角色：真实立绘、官方原声、OST 配乐，欢迎探索。</p>
+      <div class="hero-actions">
+        <button class="btn-primary" id="hero-start">开始探索</button>
+        <button class="btn-ghost" id="hero-regions">九大区域 ↓</button>
+      </div>
+    </div>
+
+    <div class="traveler-row">
+      <div class="traveler-card" id="traveler-aether">
+        <div class="traveler-avatar" data-avatar="aether"></div>
+        <div class="traveler-info"><b>空</b><span>Aether · 异乡的旅人</span></div>
+      </div>
+      <div class="traveler-card" id="traveler-lumine">
+        <div class="traveler-avatar" data-avatar="lumine"></div>
+        <div class="traveler-info"><b>荧</b><span>Lumine · 异乡的旅人</span></div>
+      </div>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat"><b data-count="9">0</b><span>大国度</span></div>
+      <div class="stat"><b data-count="104">0</b><span>自机角色</span></div>
+      <div class="stat"><b data-count="122">0</b><span>角色档案</span></div>
+      <div class="stat"><b data-count="10">0</b><span>官方OST</span></div>
+    </div>
+
+    <div class="region-strip" id="home-region-strip"></div>
+  </section>
+
+  <!-- ============ 九大区域 ============ -->
+  <section id="view-regions" class="view">
+    <h2 class="view-title">提瓦特 · 九大区域</h2>
+    <p class="view-sub">每一片土地，都有自己的风、歌与人。</p>
+    <div id="region-grid" class="region-grid"></div>
+  </section>
+
+  <!-- ============ 区域详情 ============ -->
+  <section id="view-region" class="view">
+    <div id="region-banner" class="region-banner"></div>
+    <div class="region-toolbar">
+      <input id="char-search" class="char-search" type="search" placeholder="🔍 搜索本区域角色…">
+      <div id="element-filter" class="chip-row"></div>
+      <select id="weapon-filter" class="select">
+        <option value="">全部武器</option>
+        <option value="sword">单手剑</option>
+        <option value="claymore">双手剑</option>
+        <option value="polearm">长柄武器</option>
+        <option value="bow">弓</option>
+        <option value="catalyst">法器</option>
+      </select>
+      <select id="rarity-filter" class="select">
+        <option value="">全部星级</option>
+        <option value="5">5★</option>
+        <option value="4">4★</option>
+      </select>
+      <span id="char-count" class="count"></span>
+    </div>
+    <div id="char-grid" class="char-grid"></div>
+  </section>
+
+  <!-- ============ 关于 ============ -->
+  <section id="view-about" class="view">
+    <h2 class="view-title">关于本手册</h2>
+    <div class="about-card">
+      <p>「提瓦特旅人图鉴」是一款 <b>纯前端同人作品</b>（HTML + CSS + JS，无框架、可完全离线运行），用于角色介绍与互动。页面布局参考原神官网思路，视觉与交互均为原创设计。</p>
+      <p><b>素材说明</b>：角色头像、祈愿立绘、名片背景、中文语音、背景音乐（官方 OST）均下载自公开网络资源，仅用于个人学习与欣赏，原神角色形象与版权归米哈游 miHoYo 所有。</p>
+      <p><b>交互小贴士</b>：点击「开启旅程」后播放主题曲；进入不同国度会自动切换当地 OST 与主题色；点击任意角色卡可查看详细档案、欣赏立绘与名片，并聆听官方中文语音；按 <kbd>/</kbd> 全局搜索、<kbd>M</kbd> 切换音乐、<kbd>Esc</kbd> 关闭弹窗、<kbd>←</kbd><kbd>→</kbd> 切换角色；连续点击右下角派蒙有彩蛋。</p>
+    </div>
+  </section>
+</main>
+
+<footer id="footer">同人创作 · 图片/语音/音乐来自公开网络资源 · 版权归米哈游 miHoYo</footer>
+
+<!-- ============ 全局搜索 ============ -->
+<div id="search-overlay" class="overlay">
+  <div class="search-box">
+    <input id="search-input" type="text" placeholder="搜索角色名 / 称号 / 国度…（Esc 关闭）">
+    <div id="search-results" class="search-results"></div>
+  </div>
+</div>
+
+<!-- ============ 角色详情 ============ -->
+<div id="detail-overlay" class="overlay">
+  <div id="detail-scene" class="detail-scene"></div>
+  <button id="detail-close" class="detail-close" title="关闭 (Esc)">✕</button>
+  <button id="detail-prev" class="detail-nav prev" title="上一个 (←)">‹</button>
+  <button id="detail-next" class="detail-nav next" title="下一个 (→)">›</button>
+  <div id="detail-card" class="detail-card"></div>
+</div>
+
+<div id="transition-overlay" aria-hidden="true"></div>
+<button id="paimon" title="派蒙" aria-label="派蒙">
+  <svg viewBox="0 0 120 100" width="64" height="54">
+    <path d="M60,14 L68,40 L98,46 L68,52 L60,84 L52,52 L22,46 L52,40 Z" fill="#fff" stroke="#e8c98a" stroke-width="4" stroke-linejoin="round"/>
+    <circle cx="60" cy="52" r="22" fill="#fff" stroke="#e8c98a" stroke-width="4"/>
+    <circle cx="53" cy="50" r="3.4" fill="#4a3b56"/>
+    <circle cx="67" cy="50" r="3.4" fill="#4a3b56"/>
+    <path d="M54,60 Q60,65 66,60" stroke="#d88a8a" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <circle cx="46" cy="45" r="4" fill="#f6b8b8" opacity=".8"/>
+    <circle cx="74" cy="45" r="4" fill="#f6b8b8" opacity=".8"/>
+    <path d="M30,30 Q14,20 20,6 Q34,12 40,26 Z" fill="#dff0ff" stroke="#aac8e8" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M90,30 Q106,20 100,6 Q86,12 80,26 Z" fill="#dff0ff" stroke="#aac8e8" stroke-width="3" stroke-linejoin="round"/>
+  </svg>
+</button>
+<div id="toast" role="status"></div>
+
+<script src="js/data.js"></script>
+<script src="js/element-icons.js"></script>
+<script src="js/voice-manifest.js"></script>
+<script src="js/music.js"></script>
+<script src="js/voice.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
